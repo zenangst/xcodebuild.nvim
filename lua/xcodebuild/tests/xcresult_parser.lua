@@ -286,7 +286,7 @@ end
 ---@param report ParsedReport
 ---@return boolean true if the report was updated, false otherwise.
 function M.fill_xcresult_data(report)
-  if not report.xcresultFilepath or not report.usesSwiftTesting then
+  if not report.xcresultFilepath or (not report.usesSwiftTesting and report.testsCount > 0) then
     return false
   end
 
@@ -304,8 +304,13 @@ function M.fill_xcresult_data(report)
     return false
   end
 
+  local outputString = table.concat(output, "\n")
+  if outputString == "" then
+    return false
+  end
+
   ---@type XcresultOutput|nil
-  local outputDecoded = vim.fn.json_decode(output)
+  local outputDecoded = vim.fn.json_decode(outputString)
   if not outputDecoded or util.is_empty(outputDecoded.testNodes) then
     return false
   end
