@@ -491,8 +491,8 @@ function M.build_project(opts)
     "-resultBundlePath",
     appdata.build_xcresult_filepath,
   }
-  command = util.merge_array(command, opts.extraBuildArgs)
   command = util.skip_nil(command)
+  command = util.merge_array(command, opts.extraBuildArgs)
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("build_project", command)
 
@@ -950,8 +950,8 @@ function M.enumerate_tests(opts, callback)
     "-test-enumeration-style",
     "flat",
   }
-  command = util.merge_array(command, opts.extraTestArgs)
   command = util.skip_nil(command)
+  command = util.merge_array(command, opts.extraTestArgs)
   command = xcodebuildOffline.wrap_command_if_needed(command)
   debug_print("enumerate_tests", command)
 
@@ -1020,8 +1020,8 @@ function M.run_tests(opts)
     "-resultBundlePath",
     appdata.test_xcresult_filepath,
   }
-  command = util.merge_array(command, opts.extraTestArgs)
   command = util.skip_nil(command)
+  command = util.merge_array(command, opts.extraTestArgs)
   command = xcodebuildOffline.wrap_command_if_needed(command)
 
   -- Disable parallel testing for Swift Packages
