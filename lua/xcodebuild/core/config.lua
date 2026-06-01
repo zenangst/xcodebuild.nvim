@@ -194,13 +194,40 @@ local defaults = {
   },
 }
 
+local original_defaults = vim.deepcopy(defaults)
+
+---@param dst table
+---@param src table
+local function sync_in_place(dst, src)
+  for key, value in pairs(dst) do
+    if src[key] == nil then
+      dst[key] = nil
+    elseif type(value) == "table" and type(src[key]) ~= "table" then
+      dst[key] = src[key]
+    end
+  end
+
+  for key, value in pairs(src) do
+    if type(value) == "table" then
+      if type(dst[key]) ~= "table" then
+        dst[key] = {}
+      end
+      sync_in_place(dst[key], value)
+    else
+      dst[key] = value
+    end
+  end
+end
+
 M.options = defaults
 
 ---Set up the configuration options.
 ---@param options table|nil
 ---@see xcodebuild.options
 function M.setup(options)
-  M.options = vim.tbl_deep_extend("force", defaults, options or {})
+  local merged = vim.tbl_deep_extend("force", vim.deepcopy(original_defaults), options or {})
+  sync_in_place(defaults, merged)
+  M.options = defaults
 end
 
 return M
