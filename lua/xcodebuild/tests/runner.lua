@@ -194,13 +194,13 @@ function M.run_tests(testsToRun)
 
     notifications.send_progress("Processing logs...")
 
+    testSearch.load_targets_map()
     fix_test_report()
 
     if config.restore_on_start then
       appdata.write_report(appdata.report)
     end
 
-    testSearch.load_targets_map()
     quickfix.set(appdata.report)
     diagnostics.refresh_all_test_buffers(appdata.report)
     logsPanel.set_logs(appdata.report, true, process_coverage)

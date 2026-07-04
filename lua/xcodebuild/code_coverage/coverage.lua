@@ -82,8 +82,10 @@ end
 ---Refreshes the code coverage for all buffers matching `file_pattern` from the config.
 function M.refresh_all_buffers()
   for _, bufnr in ipairs(buffersWithCoverage) do
-    vim.api.nvim_buf_clear_namespace(bufnr, nsNotCovered, 0, -1)
-    vim.api.nvim_buf_clear_namespace(bufnr, nsCovered, 0, -1)
+    if vim.api.nvim_buf_is_valid(bufnr) then
+      vim.api.nvim_buf_clear_namespace(bufnr, nsNotCovered, 0, -1)
+      vim.api.nvim_buf_clear_namespace(bufnr, nsCovered, 0, -1)
+    end
   end
   buffersWithCoverage = {}
 
@@ -165,6 +167,7 @@ function M.show_coverage(bufnr)
   if
     not config.enabled
     or not projectConfig.settings.showCoverage
+    or not vim.api.nvim_buf_is_valid(bufnr)
     or not vim.api.nvim_buf_is_loaded(bufnr)
     or vim.tbl_contains(buffersWithCoverage, bufnr)
     or not M.is_code_coverage_available()

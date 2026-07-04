@@ -272,11 +272,37 @@ end
 ---@return string|nil # filepath
 function M.find_filepath_by_filename(filename)
   if filename and not string.find(filename, "/") then
+    load_targets_map_if_needed()
+
     for _, paths in pairs(M.targetsFilesMap) do
       for _, path in ipairs(paths) do
         if vim.endswith(path, filename) then
           return path
         end
+      end
+    end
+
+    if util.is_empty(allSwiftFiles) then
+      allSwiftFiles = helpers.find_all_swift_files()
+    end
+
+    local paths = allSwiftFiles[filename]
+    if paths and paths[1] then
+      return paths[1]
+    end
+
+    local filesystemPaths = util.exclude_hidden_paths(util.shell({
+      "find",
+      util.get_project_root(),
+      "-type",
+      "f",
+      "-name",
+      filename,
+    }))
+
+    for _, path in ipairs(filesystemPaths or {}) do
+      if path and path ~= "" then
+        return path
       end
     end
   end

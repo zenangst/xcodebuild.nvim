@@ -500,6 +500,7 @@ function M.build_project(opts)
     stdout_buffered = false,
     stderr_buffered = false,
     cwd = opts.workingDirectory,
+    env = appdata.read_env_vars(),
     on_stdout = opts.on_stdout,
     on_stderr = opts.on_stderr,
     on_exit = opts.on_exit,
