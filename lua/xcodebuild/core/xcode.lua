@@ -273,7 +273,9 @@ function M.get_destinations(projectFile, scheme, workingDirectory, callback)
           if destination.platform and destination.id and destination.name then
             table.insert(result, destination)
           end
-        elseif string.find(trimmedLine, "Available destinations") then
+        elseif string.find(trimmedLine, "Available destinations")
+          or string.find(trimmedLine, "Destinations compatible")
+        then
           foundDestinations = true
         end
       end
