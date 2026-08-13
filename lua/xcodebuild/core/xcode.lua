@@ -74,6 +74,23 @@ local M = {}
 local CANCELLED_CODE = 143
 local DEBUG = false
 
+---Returns the simulator management app bundled with the selected Xcode.
+---@return string|nil
+local function get_simulator_app()
+  local developer_dir = util.shell("xcode-select -p")[1]
+  if not developer_dir then
+    return nil
+  end
+
+  local applications_dir = vim.fn.fnamemodify(developer_dir, ":h") .. "/Applications"
+  for _, app in ipairs({ "DeviceHub.app", "Simulator.app" }) do
+    local path = applications_dir .. "/" .. app
+    if vim.fn.isdirectory(path) == 1 then
+      return path
+    end
+  end
+end
+
 ---@diagnostic disable: unused-local
 ---Prints the message if the DEBUG flag is set to true.
 ---@param name string
@@ -756,7 +773,10 @@ function M.launch_app_on_simulator(destination, bundleId, waitForDebugger, callb
   util.call(callback)
 
   if require("xcodebuild.core.config").options.commands.focus_simulator_on_app_launch then
-    util.shell("open -a Simulator")
+    local simulator_app = get_simulator_app()
+    if simulator_app then
+      vim.fn.jobstart({ "open", simulator_app }, { detach = true })
+    end
   end
 
   return vim.fn.jobstart(command, {
@@ -804,10 +824,9 @@ function M.boot_simulator(destination, callback)
     stdout_buffered = true,
     on_exit = function(_, code, _)
       if code == 0 then
-        local output = util.shell("xcode-select -p")
-
-        if util.is_not_empty(output) then
-          vim.fn.jobstart(output[1] .. "/Applications/Simulator.app/Contents/MacOS/Simulator", {
+        local simulator_app = get_simulator_app()
+        if simulator_app then
+          vim.fn.jobstart({ "open", simulator_app }, {
             detach = true,
             on_exit = function() end,
           })
